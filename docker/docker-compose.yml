@@ -9,10 +9,10 @@ services:
     ports:
       - '3306:3306'
     environment:
-      'MYSQL_DATABASE': '${MYSQL_DATABASE}'
-      'MYSQL_${env:TWITTER_KEY}ROOT_PASSWORD': '${MYSQL_PASSWORD}'
-      'MYSQL_USER': '${MYSQL_USER}'
-      'MYSQL_PASSWORD': '${MYSQL_PASSWORD}'
+      'MYSQL_DATABASE': 'my-app'
+      'MYSQL_ROOT_PASSWORD': 'password'
+      'MYSQL_USER': 'my-app'
+      'MYSQL_PASSWORD': 'password'
 
   redis:
     image: redis:alpine
