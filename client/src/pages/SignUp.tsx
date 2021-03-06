@@ -11,9 +11,23 @@ import {
   Typography,
   Box,
 } from '@material-ui/core';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Link, RouteComponentProps } from '@reach/router';
 import { useForm, Controller } from 'react-hook-form';
+
+import { AppContext } from '../contexts/AppContext';
+import { UserContext } from '../contexts/UserContext';
+
+async function createUser({ userName, password }: { userName: string; password: string }) {
+  return {
+    loggedIn: true,
+    user: {
+      userName,
+      displayName: userName,
+      id: '1',
+      isAdmin: true,
+    },
+  };
+}
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -49,22 +63,20 @@ const defaultValues: FormValues = {
 type FormErrors = {
   username?: string;
   password?: string;
-  login?: string;
+  unknown?: string;
 };
 
 const defaultErrors: FormErrors = {
   username: '',
   password: '',
-  login: '',
+  unknown: '',
 };
 
-async function attemptLogin(username: string, password: string) {
-  return { loggedIn: true, user: { username } };
-}
-
-export type LoginProps = RouteComponentProps;
-export function Login(props: LoginProps) {
+export type SignUpProps = RouteComponentProps;
+export function SignUp(props: SignUpProps) {
   const { navigate } = props;
+  const appContext = useContext(AppContext);
+  const [, setUser] = useContext(UserContext);
   const { handleSubmit, control } = useForm<FormValues>({ defaultValues });
   const [errors, setErrors] = useState<FormErrors>(defaultErrors);
   const classes = useStyles();
@@ -78,15 +90,21 @@ export function Login(props: LoginProps) {
       });
       return;
     }
-    attemptLogin(username, password).then((res) => {
-      if (res.loggedIn) {
-        // setUser({ ...res.user, loggedIn: true });
-        // navigate(`${appContext.basePathPrefix}/`);
-        alert('logged in');
-      } else {
-        setErrors({ login: 'Username or Password is incorrect' });
-      }
-    });
+    if (password.length < 6) {
+      setErrors({ password: 'Password must be at least 6 characters' });
+      return;
+    }
+    createUser({ userName: username, password: password })
+      .then((res) => {
+        if (res.loggedIn) {
+          setUser({ ...res.user, loggedIn: true });
+          return navigate(`/`);
+        }
+        throw new Error('Unable to login');
+      })
+      .catch(() => {
+        setErrors({ unknown: 'Error creating new user account, please try again later' });
+      });
   };
 
   return (
@@ -96,9 +114,9 @@ export function Login(props: LoginProps) {
         <Typography variant="h2" align="center">
           Graphql Admin Template
         </Typography>
-        <Avatar className={classes.avatar} src={`/logo_512x512.png`}></Avatar>
+        <Avatar className={classes.avatar} src={`${appContext.basePathPrefix}/logo_512x512.png`} />
         <Typography component="h1" variant="h5">
-          Sign in
+          Create new account
         </Typography>
         <form className={classes.form} noValidate onSubmit={handleSubmit(onSubmit)}>
           <Controller
@@ -126,7 +144,6 @@ export function Login(props: LoginProps) {
               <TextField
                 label="Password"
                 type="password"
-                autoComplete="current-password"
                 variant="outlined"
                 fullWidth
                 margin="normal"
@@ -138,13 +155,14 @@ export function Login(props: LoginProps) {
               />
             )}
           />
-          <FormHelperText error>{errors.login}</FormHelperText>
+
+          <FormHelperText error>{errors.unknown}</FormHelperText>
           <Button type="submit" fullWidth variant="contained" color="primary" className={classes.submit}>
-            Sign In
+            Create account
           </Button>
           <Box mt={2} />
           <Typography align="center">
-            Don&apos;t have an account? <Link to="/sign-up">Sign up</Link>
+            Already have an account? <Link to="/login">Sign in</Link>
           </Typography>
         </form>
       </div>

@@ -4,9 +4,9 @@ import { RouteComponentProps } from '@reach/router';
 
 const useStyles = makeStyles((theme) => ({}));
 
-type AdminUIProps = RouteComponentProps & {};
-export function AdminUI(props: AdminUIProps) {
+type HomeProps = RouteComponentProps & {};
+export function Home(props: HomeProps) {
   const classes = useStyles();
 
-  return <div>AdminUI</div>;
+  return <div>Home</div>;
 }

@@ -7,10 +7,10 @@ const PUBLIC_URL = process.env.PUBLIC_URL || '';
 
 module.exports = (env, options) => {
   const config = {
-    context: path.resolve(__dirname, 'client/src/'),
+    context: path.resolve(__dirname, 'src'),
     entry: './index.tsx',
     output: {
-      path: path.resolve(__dirname, 'dist', 'client'),
+      path: path.resolve(__dirname, 'dist'),
     },
     devServer: {
       contentBase: path.resolve(__dirname, './public'),
@@ -21,7 +21,7 @@ module.exports = (env, options) => {
       historyApiFallback: true,
       proxy: [
         {
-          context: ['/api', '/media', '/socket.io'],
+          context: ['/api'],
           target: 'http://localhost:9000',
         },
       ],
@@ -34,8 +34,9 @@ module.exports = (env, options) => {
     },
     plugins: [
       new webpack.EnvironmentPlugin({
-        NODE_ENV: options.mode,
+        NODE_ENV: options.mode || 'development',
         PUBLIC_URL: 'http://localhost:8000',
+        APP_BASE_PATH: '',
       }),
       new CopyPlugin({
         patterns: [{ from: '../public', to: './' }],
@@ -48,14 +49,5 @@ module.exports = (env, options) => {
     ],
   };
 
-  const envVarMap = {
-    APP_BASE_PATH: '',
-  };
-
-  if (process.env.PROD) {
-    envVarMap['APP_BASE_PATH'] = '';
-  }
-
-  config.plugins.push(new webpack.EnvironmentPlugin(envVarMap));
   return config;
 };
