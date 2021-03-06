@@ -1,0 +1,19 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --project server.tsconfig.json --watch '**/*.ts' index.ts | ./node_modules/.bin/pino-pretty",
+    "build":"tsc -p server.tsconfig.json",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "deploy": "echo 'not implemented'"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "pino-pretty": "^4.7.0",
+    "ts-node": "^9.1.1",
+    "ts-node-dev": "^1.1.6"
+  }
+}

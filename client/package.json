@@ -1,0 +1,16 @@
+{
+  "name": "client",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server",
+    "build": "yarn clean && webpack --mode=production",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "deploy": "echo 'not implemented'"
+  },
+  "license": "MIT",
+  "devDependencies": {
+  }
+}

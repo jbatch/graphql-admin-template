@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    volumes:
+      - ./data/db:/var/lib/mysql
+    restart: always
+    ports:
+      - '3306:3306'
+    environment:
+      'MYSQL_DATABASE': '${MYSQL_DATABASE}'
+      'MYSQL_${env:TWITTER_KEY}ROOT_PASSWORD': '${MYSQL_PASSWORD}'
+      'MYSQL_USER': '${MYSQL_USER}'
+      'MYSQL_PASSWORD': '${MYSQL_PASSWORD}'
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    command: /bin/bash -c 'redis-server --appendonly yes --requirepass password'
+    ports:
+      - '6379:6379'
