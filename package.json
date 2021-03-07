@@ -22,8 +22,7 @@
   "license": "ISC",
   "workspaces": [
     "client",
-    "server",
-    "shared"
+    "server"
   ],
   "devDependencies": {
     "@graphql-codegen/cli": "1.21.1",
