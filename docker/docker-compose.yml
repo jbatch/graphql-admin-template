@@ -15,8 +15,8 @@ services:
       'MYSQL_PASSWORD': 'password'
 
   redis:
-    image: redis:alpine
+    image: redis:4-alpine
     container_name: redis
-    command: /bin/bash -c 'redis-server --appendonly yes --requirepass password'
+    command: redis-server --appendonly yes --requirepass password
     ports:
       - '6379:6379'
