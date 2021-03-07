@@ -14,7 +14,7 @@ import {
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Link, RouteComponentProps } from '@reach/router';
 import { useForm, Controller } from 'react-hook-form';
-import { useLoginMutation } from '../api';
+import { useLoginMutation } from '../generated/graphql';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -70,7 +70,7 @@ export function Login(props: LoginProps) {
   const { handleSubmit, control } = useForm<FormValues>({ defaultValues });
   const [errors, setErrors] = useState<FormErrors>(defaultErrors);
   const classes = useStyles();
-  const loginMutation = useLoginMutation();
+  const [loginMutation, loginRes] = useLoginMutation();
 
   const onSubmit = async (data: FormValues) => {
     const { username, password } = data;
@@ -81,7 +81,9 @@ export function Login(props: LoginProps) {
       });
       return;
     }
-    const { errors, user } = await loginMutation.mutateAsync({ username, password });
+    const res = await loginMutation({ variables: { username, password } });
+    const { errors, user } = res.data.login;
+    console.log('Logged in as', { user });
     if (errors && errors.length) {
       return setErrors({ login: errors[0].message });
     }
