@@ -3,7 +3,8 @@ import { Request, Response } from 'express';
 
 const prisma = new PrismaClient();
 
-type SessionedRequest = Request & { session: { userId?: string } };
+export type Session = { userId?: string };
+type SessionedRequest = Request & { session: Session };
 
 export interface Context {
   prisma: PrismaClient;

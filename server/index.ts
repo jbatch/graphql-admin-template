@@ -1,16 +1,18 @@
 import 'reflect-metadata';
-import express, { Request, Response } from 'express';
-import { PrismaClient } from '@prisma/client';
-import Redis from 'ioredis';
-import session from 'express-session';
-import connectRedis from 'connect-redis';
-import { ApolloServer } from 'apollo-server-express';
-import { createContext } from './graphql/context';
-import { __prod__, COOKIE_NAME } from './constants';
-import { loadSchemaSync } from '@graphql-tools/load';
+
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
-import { join } from 'path';
+import { loadSchemaSync } from '@graphql-tools/load';
 import { addResolversToSchema } from '@graphql-tools/schema';
+import { PrismaClient } from '@prisma/client';
+import { ApolloServer } from 'apollo-server-express';
+import connectRedis from 'connect-redis';
+import express, { Request, Response } from 'express';
+import session from 'express-session';
+import Redis from 'ioredis';
+import { join } from 'path';
+
+import { __prod__, COOKIE_NAME } from './constants';
+import { createContext } from './graphql/context';
 import { resolvers } from './graphql/resolvers';
 
 const prisma = new PrismaClient();
