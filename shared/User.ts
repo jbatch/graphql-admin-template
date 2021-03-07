@@ -6,11 +6,11 @@ import { FieldError } from './FieldError';
 @ObjectType()
 export class User {
   @Field((type) => ID)
-  id: string;
+  id: number;
   @Field()
   username: string;
   @Field((type) => [String])
-  roles: Role[];
+  roles?: String[];
 }
 
 @ObjectType()

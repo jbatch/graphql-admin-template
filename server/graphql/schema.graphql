@@ -1,0 +1,26 @@
+type FieldError {
+  field: String
+  message: String!
+}
+
+type User {
+  id: Int!
+  username: String!
+  roles: [String!]
+}
+
+type UserResponse {
+  errors: [FieldError!]
+  user: User
+}
+
+type Mutation {
+  register(username: String!, password: String!): UserResponse!
+  login(username: String!, password: String!): UserResponse!
+}
+
+type Query {
+  me: UserResponse
+  user(id: Float!): User
+  allUsers: [User!]
+}

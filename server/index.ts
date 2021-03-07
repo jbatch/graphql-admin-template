@@ -1,16 +1,17 @@
 import 'reflect-metadata';
-import * as tq from 'type-graphql';
 import express, { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { ApolloServer } from 'apollo-server-express';
-import 'dotenv-safe/config';
-
 import { createContext } from './graphql/context';
-import { UserResolver } from './graphql/resolvers/UserResolver';
 import { __prod__, COOKIE_NAME } from './constants';
+import { loadSchemaSync } from '@graphql-tools/load';
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader';
+import { join } from 'path';
+import { addResolversToSchema } from '@graphql-tools/schema';
+import { resolvers } from './graphql/resolvers';
 
 const prisma = new PrismaClient();
 
@@ -40,12 +41,14 @@ async function main() {
     })
   );
 
-  const schema = await tq.buildSchema({
-    resolvers: [UserResolver],
+  const schema = loadSchemaSync(join(__dirname, 'graphql', 'schema.graphql'), { loaders: [new GraphQLFileLoader()] });
+  const schemaWithResolvers = addResolversToSchema({
+    schema,
+    resolvers,
   });
 
   const apollo = new ApolloServer({
-    schema,
+    schema: schemaWithResolvers,
     context: ({ req, res }: { req: Request; res: Response }) => createContext(req, res),
     playground: {
       settings: {

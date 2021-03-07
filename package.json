@@ -15,7 +15,8 @@
     "build:client": "cd client && yarn build",
     "clean:server": "cd server && yarn clean",
     "clean:client": "cd client && yarn clean",
-    "typecheck": "echo 'not implemented'"
+    "typecheck": "echo 'not implemented'",
+    "generate": "graphql-codegen --config codegen.yml"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +26,13 @@
     "shared"
   ],
   "devDependencies": {
+    "@graphql-codegen/cli": "1.21.1",
+    "@graphql-codegen/introspection": "1.18.1",
+    "@graphql-codegen/typescript": "1.21.0",
+    "@graphql-codegen/typescript-operations": "1.17.14",
+    "@graphql-codegen/typescript-react-apollo": "2.2.1",
+    "@graphql-codegen/typescript-resolvers": "1.18.2",
+    "@graphql-codegen/typescript-type-graphql": "^1.18.2",
     "@types/node": "^14.14.31",
     "eslint": "^7.21.0",
     "eslint-config-prettier": "^8.1.0",
@@ -50,6 +58,7 @@
     "printWidth": 120
   },
   "dependencies": {
-    "@prisma/client": "^2.18.0"
+    "@prisma/client": "^2.18.0",
+    "graphql": "^15.5.0"
   }
 }
