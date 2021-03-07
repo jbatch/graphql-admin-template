@@ -1,13 +1,14 @@
 import { PrismaClient, User } from '@prisma/client';
+import argon2 from 'argon2';
 import pino from 'pino';
+
 import { Session } from '../graphql/context';
 import { UserResponse } from '../graphql/graphql';
-import argon2 from 'argon2';
 
 const prisma = new PrismaClient();
 const logger = pino();
 
-export const userService = {
+export const users = {
   async findUserById(userId: number): Promise<User> {
     return prisma.user.findUnique({ where: { id: userId } });
   },

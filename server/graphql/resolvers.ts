@@ -1,10 +1,10 @@
-import argon2 from 'argon2';
 import { IResolvers } from 'graphql-tools';
 import pino from 'pino';
 
-import { MutationResolvers, QueryResolvers, UserResolvers } from './graphql';
 import { Errors } from '../errors';
-import { userService } from '../models/user';
+import { users } from '../models/users';
+import { roles } from '../models/roles';
+import { MutationResolvers, QueryResolvers, UserResolvers } from './graphql';
 
 interface Resolvers {
   Query: QueryResolvers;
@@ -21,30 +21,29 @@ export const resolvers: Resolvers & IResolvers = {
       if (!userId) {
         return unauthenticatedError();
       }
-      const user = await userService.findUserById(Number(userId));
+      const user = await users.findUserById(Number(userId));
       return { user };
     },
     allUsers: async (root, args, ctx, info) => {
-      const users = await userService.findAllUsers();
-      logger.info('allUsers(): Returning %s users', users.length);
-      return users;
+      const allUsers = await users.findAllUsers();
+      logger.info('allUsers(): Returning %s users', allUsers.length);
+      return allUsers;
     },
     user: async (root, args, ctx, info) => {
-      return await userService.findUserById(args.id);
+      return await users.findUserById(args.id);
     },
   },
   Mutation: {
     login: async (root, args, ctx, info) => {
-      return userService.login(args.username, args.username, ctx.req.session);
+      return users.login(args.username, args.username, ctx.req.session);
     },
     register: async (root, args, ctx, info) => {
-      return userService.register(args.username, args.password);
+      return users.register(args.username, args.password);
     },
   },
   User: {
     roles: async (user, args, ctx, info) => {
-      const roles = await ctx.prisma.role.findMany({ where: { userId: user.id } });
-      return roles.map((r) => r.name);
+      return roles.findRolesForUser(user.id);
     },
   },
 };
