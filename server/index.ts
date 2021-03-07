@@ -6,6 +6,8 @@ import Redis from 'ioredis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import { ApolloServer } from 'apollo-server-express';
+import 'dotenv-safe/config';
+
 import { createContext } from './graphql/context';
 import { UserResolver } from './graphql/resolvers/UserResolver';
 import { __prod__, COOKIE_NAME } from './constants';

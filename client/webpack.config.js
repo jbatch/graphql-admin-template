@@ -21,8 +21,8 @@ module.exports = (env, options) => {
       historyApiFallback: true,
       proxy: [
         {
-          context: ['/api'],
-          target: 'http://localhost:9000',
+          context: ['/graphql'],
+          target: 'http://localhost:4000',
         },
       ],
     },

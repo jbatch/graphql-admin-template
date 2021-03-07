@@ -69,6 +69,8 @@ export function Login(props: LoginProps) {
   const [errors, setErrors] = useState<FormErrors>(defaultErrors);
   const classes = useStyles();
 
+  console.log('Rendering login');
+
   const onSubmit = (data: FormValues) => {
     const { username, password } = data;
     if (!username || !password) {

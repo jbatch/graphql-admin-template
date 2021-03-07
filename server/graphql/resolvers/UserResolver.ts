@@ -2,10 +2,12 @@ import 'reflect-metadata';
 import { Resolver, Query, Ctx, Arg, Mutation } from 'type-graphql';
 import argon2 from 'argon2';
 import pino from 'pino';
-import { User, UserResponse } from '../types/User';
+import { User, UserResponse } from '@repo/shared/User';
+import { Errors } from '@repo/shared/Errors';
+import { UsernamePasswordInput } from '@repo/shared/UsernamePasswordInput';
+import { LoginInput } from '@repo/shared/LoginInput';
+
 import { Context } from '../context';
-import { UsernamePasswordInput } from '../inputs/UsernamePasswordInput';
-import { LoginInput } from '../inputs/LoginInput';
 
 const logger = pino();
 
@@ -76,7 +78,7 @@ export class UserResolver {
 }
 
 const unauthenticatedError = () => {
-  return { errors: [{ message: `Not authenticated` }] };
+  return { errors: [{ message: Errors.NOT_AUTHENTICATED }] };
 };
 
 const failedLogin = (username: string) => {

@@ -13,5 +13,5 @@
     "baseUrl": ".",
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["./client", "./server", "./typings"]
+  "include": ["./client", "./server", "./shared", "./typings", ]
 }

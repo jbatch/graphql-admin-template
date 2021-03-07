@@ -21,7 +21,8 @@
   "license": "ISC",
   "workspaces": [
     "client",
-    "server"
+    "server",
+    "shared"
   ],
   "devDependencies": {
     "@types/node": "^14.14.31",
