@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Resolver, Query, Ctx, Arg, Mutation } from 'type-graphql';
+import { Resolver, Query, Ctx, Arg, Mutation, FieldResolver, Root } from 'type-graphql';
 import argon2 from 'argon2';
 import pino from 'pino';
 import { User, UserResponse } from '@repo/shared/User';
@@ -13,24 +13,33 @@ const logger = pino();
 
 @Resolver(User)
 export class UserResolver {
-  @Query((returns) => UserResponse, { nullable: true })
+  @FieldResolver(() => [String])
+  async roles(@Root() user: User, @Ctx() ctx: Context): Promise<String[]> {
+    if (user.roles === null) {
+      return [];
+    }
+    const roleIds = user.roles.map((r) => r.id);
+    return (await ctx.prisma.role.findMany({ where: { id: { in: roleIds } } })).map((r) => r.name);
+  }
+
+  @Query(() => UserResponse, { nullable: true })
   async me(@Ctx() ctx: Context): Promise<UserResponse> {
     const userId = ctx.req.session.userId;
     if (!userId) {
       return unauthenticatedError();
     }
-    const user = await ctx.prisma.user.findUnique({ where: { id: Number(userId) } });
+    const user = await ctx.prisma.user.findUnique({ where: { id: Number(userId) }, include: { roles: true } });
     return { user };
   }
 
-  @Query((returns) => User, { nullable: true })
+  @Query(() => User, { nullable: true })
   async user(@Arg('id') id: number, @Ctx() ctx: Context) {
-    return ctx.prisma.user.findUnique({ where: { id } });
+    return ctx.prisma.user.findUnique({ where: { id }, include: { roles: true } });
   }
 
-  @Query((returns) => [User], { nullable: true, description: 'Return a list of all users' })
+  @Query(() => [User], { nullable: true, description: 'Return a list of all users' })
   async allUsers(@Ctx() ctx: Context) {
-    const users = await ctx.prisma.user.findMany();
+    const users = await ctx.prisma.user.findMany({ include: { roles: true } });
     logger.info('allUsers(): Returning %s users', users.length);
     return users;
   }
@@ -40,13 +49,15 @@ export class UserResolver {
     // TODO validate input
     const hashedPassword = await argon2.hash(options.password);
     try {
-      const user = await ctx.prisma.user.create({ data: { username: options.username, password: hashedPassword } });
+      let user = await ctx.prisma.user.create({ data: { username: options.username, password: hashedPassword } });
+      // Give user the USER role by default.
+      const role = await ctx.prisma.role.create({ data: { userId: user.id, name: 'USER' } });
       logger.info('Created new user: %s', user.username);
-      return { user };
+      return { user: { ...user, roles: [role] } };
     } catch (error: any) {
       const { message } = error;
       if (message.includes('Unique constraint failed on the constraint') && message.includes('username_unique')) {
-        return userAlreadyExists(options.username);
+        return userAlreadyExists();
       }
       return unexpectedError(error);
     }
@@ -55,7 +66,10 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async login(@Arg('options') options: LoginInput, @Ctx() ctx: Context): Promise<UserResponse> {
     try {
-      const maybeUser = await ctx.prisma.user.findUnique({ where: { username: options.username } });
+      const maybeUser = await ctx.prisma.user.findUnique({
+        where: { username: options.username },
+        include: { roles: true },
+      });
       // Check user exists
       if (maybeUser === null) {
         return failedLogin(options.username);
@@ -86,8 +100,8 @@ const failedLogin = (username: string) => {
   return { errors: [{ field: 'username', message: `User not found or password incorrect` }] };
 };
 
-const userAlreadyExists = (username: string) => {
-  return { errors: [{ field: 'username', message: `User already exists with username ${username}` }] };
+const userAlreadyExists = () => {
+  return { errors: [{ field: 'username', message: `User already exists with username` }] };
 };
 
 const unexpectedError = (error: any) => {

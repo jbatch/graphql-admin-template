@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { Role } from '@prisma/client';
 import { ObjectType, Field, ID } from 'type-graphql';
 import { FieldError } from './FieldError';
 
@@ -8,6 +9,8 @@ export class User {
   id: string;
   @Field()
   username: string;
+  @Field((type) => [String])
+  roles: Role[];
 }
 
 @ObjectType()

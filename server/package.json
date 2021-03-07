@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@prisma/client": "^2.18.0",
+    "@repo/shared": "*",
     "apollo-server": "^2.21.0",
     "apollo-server-express": "^2.21.0",
     "argon2": "^0.27.1",

@@ -11,4 +11,17 @@ model User {
   id       Int    @id @default(autoincrement())
   username String @unique
   password String
+  roles    Role[]
+}
+
+model Role {
+  id     Int      @id @default(autoincrement())
+  name   RoleName
+  user   User     @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+enum RoleName {
+  USER
+  ADMIN
 }
