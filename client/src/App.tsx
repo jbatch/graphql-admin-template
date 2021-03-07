@@ -19,9 +19,9 @@ export function App(props: AppProps) {
   console.log('rendering app');
   return (
     <Router basepath={'/'}>
-      <Login path="/login" />
-      <SignUp path="/sign-up" />
-      <AdminUI path="/admin" />
+      <Login path="login" />
+      <SignUp path="sign-up" />
+      <AdminUI path="admin" />
       <Home default path="/" />
     </Router>
   );

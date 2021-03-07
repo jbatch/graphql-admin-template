@@ -1,6 +1,6 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core';
-import { RouteComponentProps, useNavigate } from '@reach/router';
+import { RouteComponentProps, useLocation, useNavigate } from '@reach/router';
 import { Errors } from '@repo/shared/Errors';
 import { useMeQuery } from '../api';
 import { Loading } from './Loading';
@@ -12,16 +12,13 @@ type AdminUIProps = RouteComponentProps & {};
 export function AdminUI(props: AdminUIProps) {
   const classes = useStyles();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isLoading, isError, error, data } = useMeQuery();
-
-  console.log('Rendering adming', { isLoading, isError, error, data });
 
   if (isLoading) return <Loading />;
   if (isError) {
     if (error.message === Errors.NOT_AUTHENTICATED) {
-      console.log('Navigating:', window.location.href);
-      const url = `login?next=${window.location.href}`;
-      navigate(url, { replace: true });
+      navigate('login', { state: { nextUrl: location.pathname } });
     }
     return <Error error={error.message} />;
   }

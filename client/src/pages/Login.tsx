@@ -14,6 +14,7 @@ import {
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import { Link, RouteComponentProps } from '@reach/router';
 import { useForm, Controller } from 'react-hook-form';
+import { useLoginMutation } from '../api';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -62,16 +63,16 @@ async function attemptLogin(username: string, password: string) {
   return { loggedIn: true, user: { username } };
 }
 
-export type LoginProps = RouteComponentProps;
+type RouteState = { location?: { state: { nextUrl: string } } };
+export type LoginProps = RouteComponentProps & RouteState;
 export function Login(props: LoginProps) {
   const { navigate } = props;
   const { handleSubmit, control } = useForm<FormValues>({ defaultValues });
   const [errors, setErrors] = useState<FormErrors>(defaultErrors);
   const classes = useStyles();
+  const loginMutation = useLoginMutation();
 
-  console.log('Rendering login');
-
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     const { username, password } = data;
     if (!username || !password) {
       setErrors({
@@ -80,15 +81,12 @@ export function Login(props: LoginProps) {
       });
       return;
     }
-    attemptLogin(username, password).then((res) => {
-      if (res.loggedIn) {
-        // setUser({ ...res.user, loggedIn: true });
-        // navigate(`${appContext.basePathPrefix}/`);
-        alert('logged in');
-      } else {
-        setErrors({ login: 'Username or Password is incorrect' });
-      }
-    });
+    const { errors, user } = await loginMutation.mutateAsync({ username, password });
+    if (errors && errors.length) {
+      return setErrors({ login: errors[0].message });
+    }
+    if (props.location.state?.nextUrl) return navigate(props.location.state.nextUrl);
+    else navigate('/');
   };
 
   return (

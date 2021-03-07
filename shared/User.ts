@@ -5,7 +5,7 @@ import { FieldError } from './FieldError';
 @ObjectType()
 export class User {
   @Field((type) => ID)
-  id: number;
+  id: string;
   @Field()
   username: string;
 }

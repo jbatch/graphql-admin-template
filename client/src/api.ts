@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from 'react-query';
 import { request, gql } from 'graphql-request';
 import { UserResponse } from '@repo/shared/User';
+import { LoginInput } from '@repo/shared/LoginInput';
 
 const endpoint = `http://localhost:8000/graphql`;
 
@@ -27,18 +28,18 @@ export function useMeQuery() {
       if (res.me.errors) throw new Error(res.me.errors.map((e) => e.message).join('\n'));
       return res.me;
     },
-    { retry: false }
+    { retry: false, cacheTime: 0 }
   );
 }
 
 export function useLoginMutation() {
-  return useMutation('login', async () => {
+  return useMutation('login', async (loginInput: LoginInput) => {
     console.log('login');
-    const res = await request(
+    const res = await request<{ login: UserResponse }>(
       endpoint,
       gql`
-        mutation {
-          login(options: { username: "New User", password: "password" }) {
+        mutation Login($username: String!, $password: String!) {
+          login(options: { username: $username, password: $password }) {
             user {
               id
               username
@@ -49,9 +50,9 @@ export function useLoginMutation() {
             }
           }
         }
-      `
+      `,
+      loginInput
     );
-    console.log(res);
-    return res;
+    return res.login;
   });
 }
